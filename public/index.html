@@ -690,8 +690,8 @@ body {
 
     // Out of bounds
     for (const p of alivePieces) {
-      if (p.x < -PIECE_RADIUS || p.x > CANVAS_SIZE + PIECE_RADIUS ||
-          p.y < -PIECE_RADIUS || p.y > CANVAS_SIZE + PIECE_RADIUS) {
+      if (p.x < 0 || p.x > CANVAS_SIZE ||
+          p.y < 0 || p.y > CANVAS_SIZE) {
         p.alive = false;
         lastExitColor = p.color;
         playFallSound();
