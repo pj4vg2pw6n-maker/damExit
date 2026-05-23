@@ -198,8 +198,8 @@ body {
   <p class="subtitle">COLPISCI &bull; ESPELLI &bull; VINCI</p>
   <button id="start-btn">Inizia partita</button>
   <div id="controls-hint">
-    Frecce ← → per selezionare / ruotare<br>
-    Invio per confermare
+    BIANCO: Frecce ← → + Invio<br>
+    NERO: A S + Tab
   </div>
 </div>
 
@@ -491,10 +491,13 @@ body {
     const label = currentPlayer === 'white' ? 'Turno di BIANCO' : 'Turno di NERO';
     document.getElementById('turn-label').textContent = animating ? 'In movimento...' : label;
 
+    const isWhite = currentPlayer === 'white';
+    const lr = isWhite ? '← →' : 'A S';
+    const confirm = isWhite ? 'Invio' : 'Tab';
     const phaseTexts = [
-      'Frecce ← → per selezionare pedina, Invio per confermare',
-      'Frecce ← → per ruotare direzione, Invio per confermare',
-      'Invio per lanciare!'
+      `${lr} per selezionare pedina, ${confirm} per confermare`,
+      `${lr} per ruotare direzione, ${confirm} per confermare`,
+      `${confirm} per lanciare!`
     ];
     document.getElementById('phase-label').textContent = animating ? '' : (gameOver ? '' : phaseTexts[phase] || '');
   }
@@ -659,6 +662,19 @@ body {
     requestAnimationFrame(gameLoop);
   }
 
+  function isLeft(e) {
+    if (currentPlayer === 'white') return e.key === 'ArrowLeft';
+    return e.key === 'a' || e.key === 'A';
+  }
+  function isRight(e) {
+    if (currentPlayer === 'white') return e.key === 'ArrowRight';
+    return e.key === 's' || e.key === 'S';
+  }
+  function isConfirm(e) {
+    if (currentPlayer === 'white') return e.key === 'Enter';
+    return e.key === 'Tab';
+  }
+
   function handleKey(e) {
     if (gameOver || animating) return;
 
@@ -666,24 +682,24 @@ body {
     if (myPieces.length === 0) return;
 
     if (phase === 0) {
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      if (isLeft(e) || isRight(e)) {
         e.preventDefault();
-        const dir = e.key === 'ArrowRight' ? 1 : -1;
+        const dir = isRight(e) ? 1 : -1;
         cursorIndex = ((cursorIndex + dir) % myPieces.length + myPieces.length) % myPieces.length;
-      } else if (e.key === 'Enter') {
+      } else if (isConfirm(e)) {
         e.preventDefault();
         selectedPiece = myPieces[cursorIndex % myPieces.length];
         aimAngle = -Math.PI / 2;
         phase = 1;
       }
     } else if (phase === 1) {
-      if (e.key === 'ArrowLeft') {
+      if (isLeft(e)) {
         e.preventDefault();
-        aimAngle -= 0.087; // ~5 degrees
-      } else if (e.key === 'ArrowRight') {
+        aimAngle -= 0.087;
+      } else if (isRight(e)) {
         e.preventDefault();
         aimAngle += 0.087;
-      } else if (e.key === 'Enter') {
+      } else if (isConfirm(e)) {
         e.preventDefault();
         phase = 2;
       } else if (e.key === 'Escape') {
@@ -693,7 +709,7 @@ body {
         clearOverlay();
       }
     } else if (phase === 2) {
-      if (e.key === 'Enter') {
+      if (isConfirm(e)) {
         e.preventDefault();
         const speed = powerPhase * MAX_LAUNCH_SPEED + 1;
         selectedPiece.vx = Math.cos(aimAngle) * speed;
