@@ -288,17 +288,7 @@ body {
       <input type="text" id="name-black" maxlength="16" placeholder="Il tuo nome...">
     </div>
   </div>
-  <button id="name-btn">Continua</button>
-</div>
-
-<div id="start-screen" style="display:none;">
-  <h1>damExit</h1>
-  <p class="subtitle">COLPISCI &bull; ESPELLI &bull; VINCI</p>
-  <button id="start-btn">Inizia partita</button>
-  <div id="controls-hint">
-    BIANCO: Frecce ← → + Invio<br>
-    NERO: A D + Tab
-  </div>
+  <button id="name-btn">Inizia partita</button>
 </div>
 
 <div id="game-wrapper" style="display:none;">
@@ -834,8 +824,26 @@ body {
     }
   }
 
+  function playStartSound() {
+    if (!audioCtx) return;
+    const notes = [330, 440, 550];
+    notes.forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      const gain = audioCtx.createGain();
+      const t = audioCtx.currentTime + i * 0.1;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.12, t + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.22);
+    });
+  }
+
   function startGame() {
-    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('name-screen').style.display = 'none';
     document.getElementById('game-wrapper').style.display = 'flex';
     document.getElementById('win-screen').style.display = 'none';
 
@@ -855,6 +863,7 @@ body {
     lastTime = 0;
     lastExitColor = null;
 
+    playStartSound();
     render();
   }
 
@@ -882,11 +891,6 @@ body {
     const b = document.getElementById('name-black').value.trim();
     playerNames.white = w || 'Bianco';
     playerNames.black = b || 'Nero';
-    document.getElementById('name-screen').style.display = 'none';
-    document.getElementById('start-screen').style.display = 'flex';
-  });
-
-  document.getElementById('start-btn').addEventListener('click', () => {
     initAudio();
     startGame();
     requestAnimationFrame(gameLoop);
