@@ -738,7 +738,7 @@ body {
     overlayCtx = overlayCanvas.getContext('2d');
 
     initPieces();
-    currentPlayer = 'white';
+    currentPlayer = Math.random() < 0.5 ? 'white' : 'black';
     phase = 0;
     cursorIndex = 0;
     selectedPiece = null;
