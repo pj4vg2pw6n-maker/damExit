@@ -355,6 +355,7 @@ body {
   let animating = false;
   let gameOver = false;
   let lastTime = 0;
+  let lastExitColor = null;
 
   function initAudio() {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -702,6 +703,7 @@ body {
       if (p.x < -PIECE_RADIUS || p.x > CANVAS_SIZE + PIECE_RADIUS ||
           p.y < -PIECE_RADIUS || p.y > CANVAS_SIZE + PIECE_RADIUS) {
         p.alive = false;
+        lastExitColor = p.color;
         playFallSound();
       }
     }
@@ -718,11 +720,12 @@ body {
     const bc = getPiecesOf('black').length;
     if (wc === 0 || bc === 0) {
       gameOver = true;
-      const winner = wc > 0 ? playerNames.white : playerNames.black;
+      const whiteWins = (wc === 0 && bc === 0) ? lastExitColor === 'white' : wc > 0;
+      const winner = whiteWins ? playerNames.white : playerNames.black;
       const winScreen = document.getElementById('win-screen');
       const winText = document.getElementById('win-text');
       winText.textContent = `Vince ${winner}!`;
-      winText.className = wc > 0 ? 'winner-white' : 'winner-black';
+      winText.className = whiteWins ? 'winner-white' : 'winner-black';
       winScreen.style.display = 'flex';
       playWinSound();
       return true;
@@ -740,7 +743,12 @@ body {
     phase = 0;
     cursorIndex = 0;
     selectedPiece = null;
-    aimAngle = 0;
+    aimAngle = -Math.PI / 2;
+    const myPieces = getPiecesOf(currentPlayer);
+    if (myPieces.length === 1) {
+      selectedPiece = myPieces[0];
+      phase = 1;
+    }
   }
 
   function gameLoop(timestamp) {
@@ -845,6 +853,7 @@ body {
     animating = false;
     gameOver = false;
     lastTime = 0;
+    lastExitColor = null;
 
     render();
   }
