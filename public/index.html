@@ -199,7 +199,7 @@ body {
   <button id="start-btn">Inizia partita</button>
   <div id="controls-hint">
     BIANCO: Frecce ← → + Invio<br>
-    NERO: A S + Tab
+    NERO: A D + Tab
   </div>
 </div>
 
@@ -492,7 +492,7 @@ body {
     document.getElementById('turn-label').textContent = animating ? 'In movimento...' : label;
 
     const isWhite = currentPlayer === 'white';
-    const lr = isWhite ? '← →' : 'A S';
+    const lr = isWhite ? '← →' : 'A D';
     const confirm = isWhite ? 'Invio' : 'Tab';
     const phaseTexts = [
       `${lr} per selezionare pedina, ${confirm} per confermare`,
@@ -668,7 +668,7 @@ body {
   }
   function isRight(e) {
     if (currentPlayer === 'white') return e.key === 'ArrowRight';
-    return e.key === 's' || e.key === 'S';
+    return e.key === 'd' || e.key === 'D';
   }
   function isConfirm(e) {
     if (currentPlayer === 'white') return e.key === 'Enter';
